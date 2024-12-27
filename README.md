@@ -27,7 +27,7 @@ bash Patch-for-PCT-to-support-oci.sh -R
 
 ### 支持的 PCT 功能：
 
-- [x] 快照 (Replication)
+- [x] 快照 (Snapshots)
 - [x] 备份 (Backup)
 - [x] 模板 (template) + 完整克隆 (Full Clone)
 - [x] 防火墙 (Firewall)
