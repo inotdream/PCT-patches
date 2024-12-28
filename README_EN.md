@@ -5,7 +5,7 @@
 >
 > **Cluster user note:** This script has not been tested in a cluster environment and therefore **is not recommended** for use in a cluster environment.
 >
-> **Compatibility Disclaimer:** This script **has only been tested on fresh installations of PVE 8.0, 8.1, 8.2, and 8.3**. Other versions or non-new installations may have unknown risks.
+> **Compatibility Disclaimer:** This script **has only been tested on fresh installations of PVE 8.0, 8.1, 8.2, and 8.3**. Other versions or non-new installations may have unknown risks. Not tested on ARM64 architecture PVE, not recommended for ARM64 version PVE users!!
 >
 > Be sure to back up important data before using this script. All data loss caused by the script is the responsibility of the user, and running the script is considered as agreeing to this statement!
 >
