@@ -81,45 +81,39 @@ pz3t6UX6H1fiYm4AKAAA'
 ########### Function ###########
 
 apply_patch(){
-	TARGET_DIR=$1
-	PATCH_FILE=$2
+    TARGET_DIR=$1
+    PATCH_FILE=$2
 
-	ORIGINAL_FILE="${PATCH_FILE%.diff}"
-	ORIGINAL_PATH="$TARGET_DIR/$ORIGINAL_FILE"
-	BACKUP_PATH="$ORIGINAL_PATH.bak"
+    ORIGINAL_FILE="${PATCH_FILE%.diff}"
+    ORIGINAL_PATH="$TARGET_DIR/$ORIGINAL_FILE"
+    BACKUP_PATH="$ORIGINAL_PATH.bak"
 
-	if [ -e "$BACKUP_PATH" ]; then
-		echo "Backup file already exists: $BACKUP_PATH"
-	elif [ -e "$ORIGINAL_PATH" ]; then
-		echo "Backup $ORIGINAL_PATH to $BACKUP_PATH"
-		cp "$ORIGINAL_PATH" "$BACKUP_PATH"
-	else
-		echo "Original file not found: $ORIGINAL_PATH"
-		exit 1
-	fi
-	
-	if patch --dry-run -d "$TARGET_DIR" < "/tmp/$PATCH_FILE" >/dev/null 2>&1; then
-		echo "$PATCH_FILE Patch can be apply successfully."
-		patch -d "$TARGET_DIR" < "/tmp/$PATCH_FILE"
-	else
-		echo "$PATCH_FILE Patch cannot be apply. Please check the patch file and target directory."
-		restore_patch $TARGET_DIR $ORIGINAL_FILE
-        echo "The current PVE version is $PVE_VERSION."
-        echo "If you need to submit an issue, please take a screenshot of this message and include it in your report."
-        echo "当前 PVE 版本为 $PVE_VERSION。"
-        echo "如需提交问题，请截图当前信息并附在报告中。"
-        Need_RestartAPI=0
+    if [ -e "$BACKUP_PATH" ]; then
+        echo "Backup file already exists: $BACKUP_PATH"
+    elif [ -e "$ORIGINAL_PATH" ]; then
+        echo "Backup $ORIGINAL_PATH to $BACKUP_PATH"
+        cp "$ORIGINAL_PATH" "$BACKUP_PATH"
+    else
+        echo "Original file not found: $ORIGINAL_PATH"
         exit 1
-	fi
+    fi
+
+    if patch --dry-run -d "$TARGET_DIR" < "/tmp/$PATCH_FILE" ; then
+        echo "$PATCH_FILE Patch can be apply successfully."
+        patch -d "$TARGET_DIR" < "/tmp/$PATCH_FILE" >/dev/null 2>&1
+    else
+        echo "$PATCH_FILE Patch cannot be apply. Please check the patch file and target directory."
+        Fail_NeedToRestore=1
+    fi
     echo
 }
 
 restore_patch(){
-	TARGET_DIR=$1
-	TARGET_FILE=$2
-	
-	ORIGINAL_PATH="$TARGET_DIR/$TARGET_FILE"
-	BACKUP_PATH="$ORIGINAL_PATH.bak"
+    TARGET_DIR=$1
+    TARGET_FILE=$2
+
+    ORIGINAL_PATH="$TARGET_DIR/$TARGET_FILE"
+    BACKUP_PATH="$ORIGINAL_PATH.bak"
     
     if [ -e "$BACKUP_PATH" ]; then
         mv $BACKUP_PATH $ORIGINAL_PATH
@@ -162,14 +156,13 @@ if_already_patch(){
     echo "If you need to revert, use the -R / --restore option."
     echo "该补丁已执行，请不要再次执行。"
     echo "如需恢复，请使用 -R / --restore 参数。"
-    Need_RestartAPI=0
     exit 1
     fi
 }
 
 cleanup() {
     rm -f /tmp/patch_files.tar.gz /tmp/LXC.pm.diff /tmp/Config.pm.diff /tmp/Setup.pm.diff
-    if [ "$Need_RestartAPI" -eq 1 ]; then
+    if [ -n "$Need_RestartAPI" ]; then
     echo -e "\nrestart pve WebUI service ..."
     systemctl restart pveproxy.service && systemctl restart pvedaemon.service
     fi
@@ -194,7 +187,6 @@ case "$user_input" in
     *)
         echo "Invalid input or operation canceled, exiting the script."
         echo "输入无效或用户取消操作，脚本退出。"
-        Need_RestartAPI=0
         exit 1
         ;;
 esac
@@ -233,9 +225,20 @@ case $PATCH_VERSION in
 esac
 tar -xzf /tmp/patch_files.tar.gz -C /tmp
 
+Fail_Patches=()
 apply_patch "/usr/share/perl5/PVE" "LXC.pm.diff"
 apply_patch "/usr/share/perl5/PVE/LXC" "Config.pm.diff"
 apply_patch "/usr/share/perl5/PVE/LXC" "Setup.pm.diff"
+if [ -n "$Fail_NeedToRestore" ]; then
+    restore_patch "/usr/share/perl5/PVE" "LXC.pm"
+    restore_patch "/usr/share/perl5/PVE/LXC" "Config.pm"
+    restore_patch "/usr/share/perl5/PVE/LXC" "Setup.pm"
+    echo "The current PVE version is $PVE_VERSION."
+    echo "If you need to submit an issue, please take a screenshot of this message and include it in your report."
+    echo "当前 PVE 版本为 $PVE_VERSION。"
+    echo "如需提交问题，请截图当前信息并附在报告中。"
+    exit 1
+fi
 
 if [ ! -e /usr/share/lxc/config/oci.common.conf.bak ]; then
     echo "Patching /usr/share/lxc/config/oci.common.conf"
@@ -252,7 +255,7 @@ if [ ! -e /usr/share/perl5/PVE/LXC/Setup/Oci.pm ]; then
 fi
 
 if ! ls /dev/snd/control* 1>/dev/null 2>&1; then
-    echo "No sound devices found, attempting to load appropriate module."
+    echo "No /dev/snd/control* found, attempting to load appropriate module."
     audio_device=$(lspci | grep -i audio | tr '[:upper:]' '[:lower:]')
     if [[ "$audio_device" =~ "intel|amd" ]]; then
         snd_module=snd_hda_intel
@@ -263,7 +266,7 @@ if ! ls /dev/snd/control* 1>/dev/null 2>&1; then
     fi
     modprobe "$snd_module"
     if ! ls /dev/snd/control* 1>/dev/null 2>&1; then
-    echo "No sound devices found after module load, unloading module."
+    echo "Still not found /dev/snd/control* after module load, unloading module."
     rmod "$snd_module"
     fi
 fi
