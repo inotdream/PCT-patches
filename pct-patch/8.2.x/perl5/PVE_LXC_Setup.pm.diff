@@ -1,0 +1,29 @@
+--- /usr/share/perl5/PVE/LXC/Setup.pm.bak	2025-03-27 16:48:02.489576716 +0800
++++ /usr/share/perl5/PVE/LXC/Setup.pm	2025-03-27 16:48:02.507580461 +0800
+@@ -20,6 +20,7 @@
+ use PVE::LXC::Setup::NixOS;
+ use PVE::LXC::Setup::OpenEuler;
+ use PVE::LXC::Setup::Unmanaged;
++use PVE::LXC::Setup::Oci;
+ 
+ my $plugins = {
+     alpine    => 'PVE::LXC::Setup::Alpine',
+@@ -34,6 +35,7 @@
+     ubuntu    => 'PVE::LXC::Setup::Ubuntu',
+     nixos     => 'PVE::LXC::Setup::NixOS',
+     unmanaged => 'PVE::LXC::Setup::Unmanaged',
++    oci       => 'PVE::LXC::Setup::Oci',
+ };
+ 
+ # a map to allow supporting related distro flavours
+@@ -65,7 +67,9 @@
+ 	}
+     }
+ 
+-    if (-f "$rootdir/etc/debian_version") {
++    if (-d  "$rootdir/apex" || -d "$rootdir/oci") {
++	return "oci";
++    } elsif (-f "$rootdir/etc/debian_version") {  
+ 	return "debian";
+     } elsif (-f "$rootdir/etc/devuan_version") {
+ 	return "devuan";

@@ -1,68 +1,72 @@
-### 简介
+# PCT Patches for PVE
+
+[中文文档](https://github.com/lurenJBD/PCT-pacthes/blob/main/README-CN.md) | [English](https://github.com/lurenJBD/PCT-pacthes/blob/main/README.md)
+
+---
+
+### Introduction
 
 > [!CAUTION]
-> 如果曾使用过与 LXC/PCT 相关的其他脚本，运行该脚本可能会导致不可预估的问题。
+> If you have previously used other scripts related to LXC/PCT, running this script may cause unpredictable issues.
 >
-> **集群用户请注意：** 本脚本尚未在集群环境中测试，因此 **不建议在集群环境中使用**。
+> **Cluster user note:** This script has not been tested in a cluster environment and therefore **is not recommended** for use in a cluster environment.
 >
-> **兼容性声明：** 本脚本 **仅在全新安装的 PVE 8.0、8.1、8.2、8.3 系统上测试通过**。其他版本或非全新安装环境可能存在未知风险。未在ARM64架构的PVE上测试过，不建议ARM64版本PVE用户使用！！！
+> **Compatibility Disclaimer:** This script **has only been tested on fresh installations of PVE 8.2 and 8.3**. Other versions or non-new installations may have unknown risks. Not tested on ARM64 architecture PVE, not recommended for ARM64 version PVE users!!
 >
-> 使用本脚本前，请务必备份重要数据。脚本导致的一切数据丢失，由使用者承担，运行脚本视为同意该声明！
+> Be sure to back up important data before using this script. All data loss caused by the script is the responsibility of the user, and running the script is considered as agreeing to this statement!
+> 
+> After using this script to modify your system, try to avoid updating the PVE version. If you need to update PVE, please be sure to revert the modifications before updating to avoid unexpected issues.
 >
+> If you have previously used an older version of this script, please revert the changes first, then apply the new patch. This patch has removed support for PVE 8.0 and 8.1.
 
-让 PVE 8 的 PCT 支持 OCI 类型容器的补丁
+Patch to enable PCT in PVE 8.2 ~ 8.3 to support OCI format containers.
 
-### 使用方法
+### Usage
 
 ```bash
 wget -q https://github.com/lurenJBD/PCT-pacthes/raw/refs/heads/main/Patch-for-PCT-to-support-oci.sh
 bash Patch-for-PCT-to-support-oci.sh
 ```
-撤销补丁修改
+
+Revert Patch Modifications
 
 ```bash
 bash Patch-for-PCT-to-support-oci.sh -R
 ```
 
-### 支持的 PCT 功能
+### Supported PCT Features
 
-- [x] 快照 (Snapshots)
-- [x] 备份 (Backup)
-- [x] 模板 (template) + 完整克隆 (Full Clone)
-- [x] 防火墙 (Firewall)
+- [X] Snapshots
+- [X] Backup
+- [X] template + Full Clone
+- [X] Firewall
 
-### 不支持的 PCT 功能
+### Unsupported PCT Features
 
-- [ ] 模板  (template) + 链接克隆 (Linked Clone)
+- [ ] template + Linked Clone
 
-### 创建容器的步骤
+### Steps to create a container
 
-从 Release 下载基于Redroid官方发布Docker镜像制作的 redroid12.tar.gz 模板
+Download the Lineage18.1-houdini.tar.gz template from Release section.
 
-创建容器时 **不要勾选(Don't)** `非特权容器(Unprivileged container)`，密码随意输入，不会生效的
+When creating containers **Don't check the box** `Unprivileged container`, enter the password as you wish, it won't take effect.
 
-分配 存储空间不小于 30GB，内存不小于 4GB，关闭 Swap，即填写0
+Allocate Storage space not less than 5GB, memory not less than 4GB, turn off Swap, that is, fill in 0.
 
-配置网络 IPv4 选择 DHCP，IPv6 选哪个都一样，容器都会获得一个无状态IPv6地址，如果不想分配IPv6，请修改路由器设备设置
+Configure the network IPv4 choose DHCP, IPv6 choose any option, the container will get a stateless IPv6 address.
 
-创建完成容器后，需要将终端类型 (Console mode) 修改为 `shell`，不然无法在WebUI访问容器终端
+After creating the container, go to Resources and add a Mount Point, with Path set to `/data`, and recommended size not less than 25GB.
 
-最后在 PVE 的 shell 里执行这些代码，或者手动编辑容器的配置
+{Optional} Click Add to add a Mount Entry, with Source Path `/dev/dri`, Target Path `/dev/dri`, and Create Type set to `dir`.
 
-这里以容器ID为 100 作为演示
+This parameter is equivalent to manually writing `lxc.mount.entry: /dev/dri dev/dri none bind,optional,create=dir` in the configuration file.
 
-```shell
-ctid=100
-cat >> /etc/pve/lxc/$ctid.conf <<EOF
-lxc.mount.auto: proc:mixed sys:mixed cgroup:mixed
-lxc.autodev: 1
-lxc.autodev.tmpfs.size: 25000000
-lxc.apparmor.profile: unconfined
-lxc.init.cmd: /init androidboot.hardware=redroid androidboot.redroid_gpu_mode=auto
-lxc.mount.entry: /dev/fuse dev/fuse none bind,create=file 0 0
-lxc.mount.entry: /dev/net/tun dev/tun none bind,optional,create=file 0 0
-lxc.mount.entry: /dev/snd dev/snd none bind,optional,create=dir
-lxc.mount.entry: /dev/dri dev/dri none bind,optional,create=dir
-lxc.mount.entry: \$rootfs/data data none bind 0 0
-EOF
-```
+Next, go to the Options menu and change the terminal type (Console mode) to `shell`, otherwise you cannot access the container terminal in WebUI.
+
+Change Apparmor profile to `unconfined`, and check `AutoDev` and `FUSE` in Features.
+
+Configure the lxc.init.cmd parameter to `/init androidboot.hardware=redroid androidboot.redroid_gpu_mode=auto`.
+
+For other parameters, please refer to the Redroid documentation.
+
+Change lxc.mount.auto to set all three parameters `proc`, `sys`, and `cgroup` to `mixed`.
