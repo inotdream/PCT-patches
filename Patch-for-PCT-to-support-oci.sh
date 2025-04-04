@@ -330,6 +330,7 @@ trap cleanup EXIT
 PATCH_FILE_LIST=()
 CHECK_PATCH_PASS=()
 NEED_BACKUP_FILES=()
+Need_RestartAPI=0
 
 parse_arguments "$@"
 
@@ -359,6 +360,7 @@ else
     Need_RestartAPI=1
 fi
 
+rm -rf /tmp/patch_files.tar.gz /tmp/pct-patch
 echo "$PATCH_BASE64" | base64 -d > /tmp/patch_files.tar.gz
 tar -xzf /tmp/patch_files.tar.gz -C /tmp
 FIX_VERSION=$(echo $PVE_VERSION |  awk -F'.' '{print $1"."$2".x"}' )
