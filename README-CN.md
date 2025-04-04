@@ -47,7 +47,7 @@ bash Patch-for-PCT-to-support-oci.sh -R
 
 ### 创建容器的步骤
 
-从 Release 选择一个模板下载，本ReadMe推荐使用 Lineage18.1-houdini.tar.gz
+从 Release 选择一个模板下载，推荐使用 lineage19.1-x86_64-houdini-magisk-gapps.tar.gz
 
 创建容器时 **不要勾选(Don't)** `非特权容器(Unprivileged container)`，密码随意输入，不会生效的
 
@@ -55,9 +55,11 @@ bash Patch-for-PCT-to-support-oci.sh -R
 
 配置网络 IPv4 选择 DHCP，IPv6 选哪个都一样，容器都会获得一个无状态IPv6地址
 
+如果想关闭IPv6，请在 lxc.init.cmd 参数里添加 androidboot.disable_ipv6=1 【仅限github发布的模板支持】
+
 创建完成容器后，去 资源(Resouces) 添加一个 挂载点(Mount Point)，路径(Path) 填写`/data`，空间大小推荐不小于 25G
 
-{可选} 点击 Add 添加一个 Mount Entry，Soucre Path 填 `/dev/dri`，Target Path 填 `/dev/dri`，Create Type 选 `dir`
+【可选】 点击 Add 添加一个 Mount Entry，Soucre Path 填 `/dev/dri`，Target Path 填 `/dev/dri`，Create Type 选 `dir`
 
 这个参数等效于手动向配置文件里写 `lxc.mount.entry: /dev/dri dev/dri none bind,optional,create=dir`
 
@@ -70,3 +72,37 @@ bash Patch-for-PCT-to-support-oci.sh -R
 具体别的参数可以参考 Redroid 的文档
 
 lxc.mount.auto 将三个参数 `proc`,`sys`,`cgroup`都改为 `mixed`
+
+效果截图
+
+为OCI类型容器添加的 Mount Entry 功能（仅限OCI容器使用）
+![Image](https://github.com/user-attachments/assets/660b1df1-4ad6-49bc-8982-617b115af164)
+
+为OCI类型容器添加的 Apparmor profile ，lxc.init.cmd 和 lxc.mount.auto（后两者仅限OCI容器使用）
+![Image](https://github.com/user-attachments/assets/0b0dfee6-564a-4363-ad3b-a68e1b5ceaf4)
+
+
+### 为 PCT WebUI 添加 IP Info 显示界面
+
+感谢 Gabriel Goller(来自pve-devel) 提供的参考
+
+使用方法
+
+```bash
+wget -q https://github.com/lurenJBD/PCT-pacthes/raw/refs/heads/main/Patch-for-PVE-WebUI-Display-IPinfo-beta.sh
+bash Patch-for-PVE-WebUI-Display-IPinfo-beta.sh
+```
+撤销修改
+
+```bash
+bash Patch-for-PVE-WebUI-Display-IPinfo-beta.sh -R
+```
+
+效果截图
+
+PCT主界面显示IP信息
+![Image](https://github.com/user-attachments/assets/6fee1c85-578f-48bd-b44b-e8c01c2f9c17)
+
+IP信息详细
+![Image](https://github.com/user-attachments/assets/60037ce5-ca58-4a9e-88eb-91f022560a70)
+

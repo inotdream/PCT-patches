@@ -47,21 +47,23 @@ bash Patch-for-PCT-to-support-oci.sh -R
 
 ### Steps to create a container
 
-Download the Lineage18.1-houdini.tar.gz template from Release section.
+Download a template from the Release section, recommended to use lineage19.1-x86_64-houdini-magisk-gapps.tar.gz
 
-When creating containers **Don't check the box** `Unprivileged container`, enter the password as you wish, it won't take effect.
+When creating containers **Don't check the box** `Unprivileged container`, enter any password as it won't take effect.
 
-Allocate Storage space not less than 5GB, memory not less than 4GB, turn off Swap, that is, fill in 0.
+Allocate rootfs storage space not less than 5GB, memory not less than 4GB, turn off Swap by setting it to 0.
 
-Configure the network IPv4 choose DHCP, IPv6 choose any option, the container will get a stateless IPv6 address.
+Configure the network IPv4 to DHCP, and any IPv6 option will work as the container will get a stateless IPv6 address.
+
+If you want to disable IPv6, add androidboot.disable_ipv6=1 to the lxc.init.cmd parameter [Only supported by templates released on GitHub].
 
 After creating the container, go to Resources and add a Mount Point, with Path set to `/data`, and recommended size not less than 25GB.
 
-{Optional} Click Add to add a Mount Entry, with Source Path `/dev/dri`, Target Path `/dev/dri`, and Create Type set to `dir`.
+[Optional] Click Add to add a Mount Entry, with Source Path `/dev/dri`, Target Path `/dev/dri`, and Create Type set to `dir`.
 
 This parameter is equivalent to manually writing `lxc.mount.entry: /dev/dri dev/dri none bind,optional,create=dir` in the configuration file.
 
-Next, go to the Options menu and change the terminal type (Console mode) to `shell`, otherwise you cannot access the container terminal in WebUI.
+Next, go to the Options menu and change the Console mode to `shell`, otherwise you cannot access the container terminal in WebUI.
 
 Change Apparmor profile to `unconfined`, and check `AutoDev` and `FUSE` in Features.
 
@@ -69,4 +71,37 @@ Configure the lxc.init.cmd parameter to `/init androidboot.hardware=redroid andr
 
 For other parameters, please refer to the Redroid documentation.
 
-Change lxc.mount.auto to set all three parameters `proc`, `sys`, and `cgroup` to `mixed`.
+For lxc.mount.auto, change all three parameters `proc`, `sys`, and `cgroup` to `mixed`.
+
+### Screenshots
+
+Mount Entry feature added for OCI type containers (for OCI containers only)
+![Image](https://github.com/user-attachments/assets/660b1df1-4ad6-49bc-8982-617b115af164)
+
+Apparmor profile, lxc.init.cmd and lxc.mount.auto added for OCI type containers (the latter two are for OCI containers only)
+![Image](https://github.com/user-attachments/assets/0b0dfee6-564a-4363-ad3b-a68e1b5ceaf4)
+
+### Add IP Info Display Interface to PCT WebUI
+
+Thanks to Gabriel Goller (from pve-devel) for the reference.
+
+Usage:
+
+```bash
+wget -q https://github.com/lurenJBD/PCT-pacthes/raw/refs/heads/main/Patch-for-PVE-WebUI-Display-IPinfo-beta.sh
+bash Patch-for-PVE-WebUI-Display-IPinfo-beta.sh
+```
+
+Revert modifications:
+
+```bash
+bash Patch-for-PVE-WebUI-Display-IPinfo-beta.sh -R
+```
+
+### Screenshots
+
+IP information shown in PCT main interface
+![Image](https://github.com/user-attachments/assets/6fee1c85-578f-48bd-b44b-e8c01c2f9c17)
+
+IP information details
+![Image](https://github.com/user-attachments/assets/60037ce5-ca58-4a9e-88eb-91f022560a70)
