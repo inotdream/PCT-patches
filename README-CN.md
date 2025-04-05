@@ -21,6 +21,11 @@
 
 让 PVE 8.2 ~ 8.3 的 PCT 支持 OCI 类型容器的补丁
 
+[!TIP]
+运行脚本修改后，会对部分别的PCT容器产生影响，比如 PCT容器 里运行Docker或挂载NFS。
+为避免发生此类影响，请不要将 Redroid(OCI)容器 设为开机自启动，推荐设置一个Debian之类的容器自启动
+如果不想设置自启动，建议(自PVE系统运行以来）第一启动PCT容器为非OCI容器，就是说运行OCI容器前，请先运行一个非OCI容器
+
 ### 使用方法
 
 ```bash
@@ -49,13 +54,13 @@ bash Patch-for-PCT-to-support-oci.sh -R
 
 从 Release 选择一个模板下载，推荐使用 lineage19.1-x86_64-houdini-magisk-gapps.tar.gz
 
-创建容器时 **不要勾选(Don't)** `非特权容器(Unprivileged container)`，密码随意输入，不会生效的
+创建容器时 **不要勾选(Don't)** 非特权容器(Unprivileged container)，密码随意输入，不会生效的
 
 分配 rootfs空间大小不低于 5GB，内存不小于 4GB，关闭 Swap，即填写0
 
 配置网络 IPv4 选择 DHCP，IPv6 选哪个都一样，容器都会获得一个无状态IPv6地址
 
-如果想关闭IPv6，请在 lxc.init.cmd 参数里添加 androidboot.disable_ipv6=1 【仅限github发布的模板支持】
+如果想关闭IPv6，请在 lxc.init.cmd 参数里添加 `androidboot.disable_ipv6=1` 【仅限github发布的模板支持】
 
 创建完成容器后，去 资源(Resouces) 添加一个 挂载点(Mount Point)，路径(Path) 填写`/data`，空间大小推荐不小于 25G
 
@@ -80,6 +85,8 @@ lxc.mount.auto 将三个参数 `proc`,`sys`,`cgroup`都改为 `mixed`
 
 为OCI类型容器添加的 Apparmor profile ，lxc.init.cmd 和 lxc.mount.auto（后两者仅限OCI容器使用）
 ![Image](https://github.com/user-attachments/assets/0b0dfee6-564a-4363-ad3b-a68e1b5ceaf4)
+
+
 
 
 ### 为 PCT WebUI 添加 IP Info 显示界面

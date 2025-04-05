@@ -21,6 +21,11 @@
 
 Patch to enable PCT in PVE 8.2 ~ 8.3 to support OCI format containers.
 
+> [!TIP]
+> After running the script, it may affect other PCT containers, such as running Docker or mounting NFS in PCT containers.
+> To avoid such effects, please do not set Redroid(OCI) containers to start automatically at boot. It is recommended to set a container like Debian to auto-start instead.
+> If you don't want to set auto-start, it's recommended to first start a non-OCI container (since PVE system startup) before running an OCI container.
+
 ### Usage
 
 ```bash
@@ -49,13 +54,13 @@ bash Patch-for-PCT-to-support-oci.sh -R
 
 Download a template from the Release section, recommended to use lineage19.1-x86_64-houdini-magisk-gapps.tar.gz
 
-When creating containers **Don't check the box** `Unprivileged container`, enter any password as it won't take effect.
+When creating containers **Don't check the box** Unprivileged container, enter any password as it won't take effect.
 
 Allocate rootfs storage space not less than 5GB, memory not less than 4GB, turn off Swap by setting it to 0.
 
 Configure the network IPv4 to DHCP, and any IPv6 option will work as the container will get a stateless IPv6 address.
 
-If you want to disable IPv6, add androidboot.disable_ipv6=1 to the lxc.init.cmd parameter [Only supported by templates released on GitHub].
+If you want to disable IPv6, add `androidboot.disable_ipv6=1` to the lxc.init.cmd parameter [Only supported by templates released on GitHub].
 
 After creating the container, go to Resources and add a Mount Point, with Path set to `/data`, and recommended size not less than 25GB.
 
