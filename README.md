@@ -23,7 +23,9 @@ Patch to enable PCT in PVE 8.2 ~ 8.3 to support OCI format containers.
 
 > [!TIP]
 > After running the script, it may affect other PCT containers, such as running Docker or mounting NFS in PCT containers.
+>
 > To avoid such effects, please do not set Redroid(OCI) containers to start automatically at boot. It is recommended to set a container like Debian to auto-start instead.
+>
 > If you don't want to set auto-start, it's recommended to first start a non-OCI container (since PVE system startup) before running an OCI container.
 
 ### Usage
