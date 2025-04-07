@@ -274,14 +274,26 @@ restore_patch(){
 
 
 arrays_equal() {
-    local arr1=("$1")
-    local arr2=("$2")
+    local arr1=("${!1}")
+    local arr2=("${!2}")
 
-    if [[ $(echo "${arr1[@]}" | tr ' ' '\n' | sort | tr '\n' ' ') == $(echo "${arr2[@]}" | tr ' ' '\n' | sort | tr '\n' ' ') ]]; then
+    if [ ${#arr1[@]} -ne ${#arr2[@]} ]; then
+        printf_msg "补丁检查失败！" "Patch check Failed!"
+        if [[ "$DEBUG_MODE" -eq 1 ]]; then
+            echo "PATCH_FILE_LIST长度: ${#arr1[@]}"
+            echo "CHECK_PATCH_PASS长度: ${#arr2[@]}"
+            echo "缺少的补丁: "
+            comm -23 <(printf '%s\n' "${arr1[@]}" | sort) <(printf '%s\n' "${arr2[@]}" | sort)
+        fi
+        return 1
+    fi
+
+    local sorted1=$(printf '%s\n' "${arr1[@]}" | sort)
+    local sorted2=$(printf '%s\n' "${arr2[@]}" | sort)
+    
+    if [ "$sorted1" = "$sorted2" ]; then
         printf_msg "补丁检查通过！可以应用到当前PVE版本" "Patch check passed! Can work with this version of PVE"
-    else
-        printf_msg "补丁检查失败！可能不支持当前PVE版本" "Patch check Failed! Maybe doesn't support this version of PVE"
-        exit 1
+        return 0
     fi
 }
 
@@ -340,6 +352,10 @@ fi
 
 PVE_VERSION=$(pveversion | awk -F'/' '{print $2}' | awk -F'-' '{print $1}')
 
+if [[ "$DEBUG_MODE" -eq 1 ]]; then
+    echo "PVE_VERSION: $PVE_VERSION"
+fi
+
 if [[ "$(echo -e "$MIN_VERSION\n$PVE_VERSION" | sort -V | head -n1)" != "$MIN_VERSION" ]]; then
     printf_msg "当前PVE版本 $PVE_VERSION 低于 $MIN_VERSION。请升级PVE系统版本。" "The current PVE version $PVE_VERSION is lower than $MIN_VERSION. Please upgrade the PVE system version."
     exit 1
@@ -352,7 +368,6 @@ if [[ "$SKIP_CONFIRM" -ne 1 ]]; then
         y|Y) Need_RestartAPI=1;;
         *)
             printf_msg "输入无效或用户取消操作，脚本退出。" "Invalid input or operation canceled, exiting the script."
-            Need_RestartAPI=0
             exit 1
             ;;
     esac
@@ -360,7 +375,6 @@ else
     Need_RestartAPI=1
 fi
 
-rm -rf /tmp/patch_files.tar.gz /tmp/pct-patch
 echo "$PATCH_BASE64" | base64 -d > /tmp/patch_files.tar.gz
 tar -xzf /tmp/patch_files.tar.gz -C /tmp
 FIX_VERSION=$(echo $PVE_VERSION |  awk -F'.' '{print $1"."$2".x"}' )
@@ -423,7 +437,11 @@ if [[ "$DEBUG_MODE" -eq 1 ]]; then
     echo "NEED_BACKUP_FILES: ${NEED_BACKUP_FILES[@]}"
 fi
 
-arrays_equal $PATCH_FILE_LIST $CHECK_PATCH_PASS
+if ! arrays_equal PATCH_FILE_LIST[@] CHECK_PATCH_PASS[@]; then
+    printf_msg "由于补丁检查不通过，脚本停止执行" "Script stop execution due to patch check failure"
+    Need_RestartAPI=0
+    exit 1
+fi
 
 for FILE in "${NEED_BACKUP_FILES[@]}"; do
     BACKUP_FILE="$FILE.bak"

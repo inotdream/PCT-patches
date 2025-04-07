@@ -1,6 +1,6 @@
---- /usr/share/pve-manager/js/pvemanagerlib.js.bak	2025-04-06 20:14:15.622194637 +0800
-+++ /usr/share/pve-manager/js/pvemanagerlib.js	2025-04-06 20:22:10.855392430 +0800
-@@ -15241,6 +15241,10 @@
+--- /usr/share/pve-manager/js/pvemanagerlib.js.bak	2025-04-07 15:14:14.371672170 +0800
++++ /usr/share/pve-manager/js/pvemanagerlib.js	2025-04-07 15:16:22.307373133 +0800
+@@ -15246,6 +15246,10 @@
  	    // in this specific api call
  	    // we already have the correct value for the usage
  	    calculate: Ext.identityFn,
@@ -11,7 +11,7 @@
  	},
  	{
  	    itemId: 'memory',
-@@ -15248,16 +15252,9 @@
+@@ -15253,16 +15257,9 @@
  	    title: gettext('Memory usage'),
  	    valueField: 'mem',
  	    maxField: 'maxmem',
@@ -30,7 +30,7 @@
  	    },
  	},
  	{
-@@ -15276,20 +15273,235 @@
+@@ -15281,20 +15278,235 @@
  		    return Proxmox.Utils.render_size_usage(used, max);
  		}
  	    },
@@ -268,7 +268,7 @@
  	},
      ],
  
-@@ -20495,7 +20707,7 @@
+@@ -20500,7 +20712,7 @@
  	    let summarycolumns = sp.get('summarycolumns', 'auto');
  	    me.lookup('summarycolumns').setValue(summarycolumns);
  
@@ -277,7 +277,7 @@
  	    me.lookup('editNotesOnDoubleClick').setValue(sp.get('edit-notes-on-double-click', false));
  
  	    var settings = ['fontSize', 'fontFamily', 'letterSpacing', 'lineHeight'];
-@@ -20726,9 +20938,9 @@
+@@ -20731,9 +20943,9 @@
  		stateId: 'guest-notes-collapse',
  		reference: 'guestNotesCollapse',
  		comboItems: [
@@ -288,7 +288,7 @@
  		],
  	    },
  	    {
-@@ -36384,25 +36596,66 @@
+@@ -36390,25 +36602,66 @@
  
  	Proxmox.Utils.setErrorMask(me, true);
  
@@ -370,7 +370,7 @@
  	    },
  	});
      },
-@@ -36532,7 +36785,7 @@
+@@ -36538,7 +36791,7 @@
  		},
  		{
  		    header: gettext('VLAN Tag'),
@@ -379,7 +379,7 @@
  		    dataIndex: 'tag',
  		},
  		{
-@@ -36542,16 +36795,10 @@
+@@ -36548,16 +36801,10 @@
  		},
  		{
  		    header: gettext('IP address'),
@@ -399,7 +399,7 @@
  		    },
  		},
  		{
-@@ -46059,7 +46306,7 @@
+@@ -46079,7 +46326,7 @@
  Ext.define('PVE.window.IPInfo', {
      extend: 'Ext.window.Window',
      width: 600,
@@ -408,7 +408,7 @@
      height: 300,
      layout: {
  	type: 'fit',
-@@ -46109,9 +46356,9 @@
+@@ -46131,9 +46378,9 @@
      ],
  });
  
@@ -420,7 +420,7 @@
  
      layout: {
  	type: 'hbox',
-@@ -46119,6 +46366,9 @@
+@@ -46141,6 +46388,9 @@
      },
  
      nics: [],
@@ -430,7 +430,7 @@
  
      items: [
  	{
-@@ -46148,7 +46398,7 @@
+@@ -46170,7 +46420,7 @@
  		    hidden: true,
  		    ui: 'default-toolbar',
  		    handler: function(btn) {
@@ -439,7 +439,7 @@
  
  			var win = Ext.create('PVE.window.IPInfo');
  			win.down('grid').getStore().setData(view.nics);
-@@ -46183,54 +46433,12 @@
+@@ -46205,55 +46455,12 @@
  
      startIPStore: function(store, records, success) {
  	var me = this;
@@ -479,7 +479,8 @@
 -		    text = ips.join('<br>');
 -		}
 -	    } else if (me.nics && me.nics.error) {
--		text = Ext.String.format(text, me.nics.error.desc);
+-		let msg = gettext('Cannot get info from Guest Agent<br>Error: {0}');
+-		text = Ext.String.format(msg, Ext.htmlEncode(me.nics.error.desc));
 -	    }
 -	} else if (me.agent) {
 -	    text = gettext('Guest Agent not running');
@@ -496,7 +497,7 @@
      },
  
      initComponent: function() {
-@@ -46247,26 +46455,7 @@
+@@ -46270,26 +46477,7 @@
  	var nodename = me.pveSelNode.data.node;
  	var vmid = me.pveSelNode.data.vmid;
  
@@ -524,7 +525,7 @@
  
  	me.on('destroy', me.ipStore.stopUpdate, me.ipStore);
  
-@@ -46275,7 +46464,6 @@
+@@ -46298,7 +46486,6 @@
  	    me.startIPStore(me.rstore, me.rstore.getData(), false);
  	}
  
