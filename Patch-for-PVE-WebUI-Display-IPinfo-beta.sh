@@ -235,14 +235,13 @@ check_ready() {
                 echo "尝试使用 8.3.3 版本的补丁: $NEW_PATCH_FILE"
             fi
 
-            cp "$NEW_PATCH_FILE" "$1"
             if patch --dry-run -d "$TARGET_DIR" < "$NEW_PATCH_FILE" >/dev/null 2>&1; then
-                printf_msg "补丁 $1 可以成功应用（使用 8.3.3 版本）" "$1 Patch can be apply successfully (using version 8.3.3)."
-                CHECK_PATCH_PASS+=("$1")
+                printf_msg "补丁 $NEW_PATCH_FILE 可以成功应用" "$NEW_PATCH_FILE Patch can be apply successfully."
+                CHECK_PATCH_PASS+=("$NEW_PATCH_FILE")
                 return
             fi
         fi
-        printf_msg "补丁 $1 无法应用。请检查补丁文件和目标目录。" "$1 Patch cannot be apply. Please check the patch file and target directory."
+        printf_msg "补丁 $NEW_PATCH_FILE 无法应用。请检查补丁文件和目标目录。" "$NEW_PATCH_FILE Patch cannot be apply. Please check the patch file and target directory."
     else
         printf_msg "补丁 $1 可以成功应用" "$1 Patch can be apply successfully."
         CHECK_PATCH_PASS+=("$1")
