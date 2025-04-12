@@ -11,7 +11,7 @@
 >
 > **Cluster user note:** This script has not been tested in a cluster environment and therefore **is not recommended** for use in a cluster environment.
 >
-> **Compatibility Disclaimer:** This script **has only been tested on fresh installations of PVE 8.2 and 8.3**. Other versions or non-new installations may have unknown risks. Not tested on ARM64 architecture PVE, not recommended for ARM64 version PVE users!!
+> **Compatibility Disclaimer:** This script **has only been tested on fresh installations of PVE 8.2, 8.3 and 8.4**. Other versions or non-new installations may have unknown risks. Not tested on ARM64 architecture PVE, not recommended for ARM64 version PVE users!!
 >
 > Be sure to back up important data before using this script. All data loss caused by the script is the responsibility of the user, and running the script is considered as agreeing to this statement!
 > 
@@ -19,7 +19,7 @@
 >
 > If you have previously used an older version of this script, please revert the changes first, then apply the new patch. This patch has removed support for PVE 8.0 and 8.1.
 
-Patch to enable PCT in PVE 8.2 ~ 8.3 to support OCI format containers.
+Patch to enable PCT in PVE 8.2 ~ 8.4 to support OCI format containers.
 
 > [!TIP]
 > After running the script, it may affect other PCT containers, such as running Docker or mounting NFS in PCT containers.
@@ -91,6 +91,8 @@ Apparmor profile, lxc.init.cmd and lxc.mount.auto added for OCI type containers 
 ### Add IP Info Display Interface to PCT WebUI
 
 Thanks to Gabriel Goller (from pve-devel) for the reference.
+
+Supports PVE 8.1 ~ 8.4
 
 Usage:
 
