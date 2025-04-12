@@ -397,8 +397,9 @@ if ! command -v patch &> /dev/null; then
     printf_msg "'patch' 命令安装成功" "The 'patch' command was installed successfully"
 fi
 
-if grep -q "my \$list = \[\];" /usr/share/perl5/PVE/LXC.pm; then
+if grep -q "xtype: 'pveIPView'" /usr/share/pve-manager/js/pvemanagerlib.js; then
     printf_msg "该补丁已执行，请不要再次执行。如需恢复，请使用 -R 或 --restore 参数。" "The patch has already been applied. Please do not apply it again. If you need to revert, use the -R or --restore option."
+    Need_RestartAPI=0
     exit 1
 fi
 
