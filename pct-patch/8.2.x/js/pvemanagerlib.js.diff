@@ -1,5 +1,5 @@
---- /usr/share/pve-manager/js/pvemanagerlib.js.bak	2025-03-27 16:48:02.492577340 +0800
-+++ /usr/share/pve-manager/js/pvemanagerlib.js	2025-04-02 18:16:25.822184437 +0800
+--- /usr/share/pve-manager/js/pvemanagerlib.js.bak	2025-04-17 17:02:43.846901998 +0800
++++ /usr/share/pve-manager/js/pvemanagerlib.js	2025-04-17 17:02:43.880901996 +0800
 @@ -3079,6 +3079,17 @@
  	}
      },

@@ -32,14 +32,26 @@ Patch to enable PCT in PVE 8.2 ~ 8.4 to support OCI format containers.
 
 ```bash
 wget -q https://github.com/lurenJBD/PCT-pacthes/raw/refs/heads/main/Patch-for-PCT-to-support-oci.sh
-bash Patch-for-PCT-to-support-oci.sh
+bash Patch-for-PCT-to-support-oci.sh -e
 ```
 
 Revert Patch Modifications
 
 ```bash
-bash Patch-for-PCT-to-support-oci.sh -R
+bash Patch-for-PCT-to-support-oci.sh -e -R
 ```
+
+### Supported Parameters
+
+Usage: `Patch-for-PCT-to-support-oci.sh [options]`
+
+| Option | Description |
+|--------|-------------|
+| `-h, --help` | Show this help message |
+| `-R, --restore` | Restore original files |
+| `-y, --yes` | Skip confirmation prompts |
+| `-c, --chinese` | Use Chinese for messages (default) |
+| `-e, --english` | Use English for messages |
 
 ### Supported PCT Features
 
@@ -52,7 +64,7 @@ bash Patch-for-PCT-to-support-oci.sh -R
 
 - [ ] template + Linked Clone
 
-### Steps to create a container
+### Steps to create a Redroid container
 
 Download a template from the Release section, recommended to use lineage19.1-x86_64-houdini-magisk-gapps.tar.gz
 
@@ -62,23 +74,17 @@ Allocate rootfs storage space not less than 5GB, memory not less than 4GB, turn 
 
 Configure the network IPv4 to DHCP, and any IPv6 option will work as the container will get a stateless IPv6 address.
 
-If you want to disable IPv6, add `androidboot.disable_ipv6=1` to the lxc.init.cmd parameter [Only supported by templates released on GitHub].
+> If you want to disable IPv6, add `androidboot.disable_ipv6=1` to the `lxc.init.cmd` parameter [Only supported by Lineage templates compiled by the author]
 
 After creating the container, go to Resources and add a Mount Point, with Path set to `/data`, and recommended size not less than 25GB.
 
 [Optional] Click Add to add a Mount Entry, with Source Path `/dev/dri`, Target Path `/dev/dri`, and Create Type set to `dir`.
 
-This parameter is equivalent to manually writing `lxc.mount.entry: /dev/dri dev/dri none bind,optional,create=dir` in the configuration file.
+> This parameter is equivalent to manually writing `lxc.mount.entry: /dev/dri dev/dri none bind,optional,create=dir` in the configuration file.
 
-Next, go to the Options menu and change the Console mode to `shell`, otherwise you cannot access the container terminal in WebUI.
+PCT will now automatically configure the OCI type containers properly, and the content in the Options menu no longer needs to be manually configured.
 
-Change Apparmor profile to `unconfined`, and check `AutoDev` and `FUSE` in Features.
-
-Configure the lxc.init.cmd parameter to `/init androidboot.hardware=redroid androidboot.redroid_gpu_mode=auto`.
-
-For other parameters, please refer to the Redroid documentation.
-
-For lxc.mount.auto, change all three parameters `proc`, `sys`, and `cgroup` to `mixed`.
+For more parameters about `lxc.init.cmd`, please check [redroid-doc](https://github.com/remote-android/redroid-doc?tab=readme-ov-file#configuration)
 
 ### Screenshots
 

@@ -1,5 +1,5 @@
---- /usr/share/perl5/PVE/LXC/Config.pm.bak	2025-04-02 18:24:59.730845479 +0800
-+++ /usr/share/perl5/PVE/LXC/Config.pm	2025-04-02 18:24:59.747845509 +0800
+--- /usr/share/perl5/PVE/LXC/Config.pm.bak	2025-04-15 21:40:05.391337816 +0800
++++ /usr/share/perl5/PVE/LXC/Config.pm	2025-04-15 21:40:05.404342405 +0800
 @@ -392,6 +392,18 @@
      return PVE::JSONSchema::pve_verify_ip($addr, $noerr);
  }

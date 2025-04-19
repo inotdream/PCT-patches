@@ -32,14 +32,26 @@
 
 ```bash
 wget -q https://github.com/lurenJBD/PCT-pacthes/raw/refs/heads/main/Patch-for-PCT-to-support-oci.sh
-bash Patch-for-PCT-to-support-oci.sh
+bash Patch-for-PCT-to-support-oci.sh -c
 ```
 
 撤销补丁修改
 
 ```bash
-bash Patch-for-PCT-to-support-oci.sh -R
+bash Patch-for-PCT-to-support-oci.sh -c -R
 ```
+
+### 支持传入的参数
+
+用法: `Patch-for-PCT-to-support-oci.sh [选项]`
+
+| 选项              | 描述                                     |
+| ----------------- | ---------------------------------------- |
+| `-h, --help`    | 显示此帮助信息 (Show this help message)  |
+| `-R, --restore` | 恢复原始文件 (Restore original files)    |
+| `-y, --yes`     | 跳过确认提示 (Skip confirmation prompts) |
+| `-c, --chinese` | 使用中文显示消息（默认）                 |
+| `-e, --english` | Use English for messages                 |
 
 ### 支持的 PCT 功能
 
@@ -52,7 +64,7 @@ bash Patch-for-PCT-to-support-oci.sh -R
 
 - [ ] 模板  (template) + 链接克隆 (Linked Clone)
 
-### 创建容器的步骤
+### 创建 Redroid 容器的步骤
 
 从 Release 选择一个模板下载，推荐使用 lineage19.1-x86_64-houdini-magisk-gapps.tar.gz
 
@@ -62,23 +74,17 @@ bash Patch-for-PCT-to-support-oci.sh -R
 
 配置网络 IPv4 选择 DHCP，IPv6 选哪个都一样，容器都会获得一个无状态IPv6地址
 
-如果想关闭IPv6，请在 lxc.init.cmd 参数里添加 `androidboot.disable_ipv6=1` 【仅限github发布的模板支持】
+> 如果想关闭IPv6，请在 `lxc.init.cmd` 参数里添加 `androidboot.disable_ipv6=1` 【仅限本人编译的Lineage模板支持】
 
-创建完成容器后，去 资源(Resouces) 添加一个 挂载点(Mount Point)，路径(Path) 填写`/data`，空间大小推荐不小于 25G
+创建完成容器后，去资源(Resouces) 添加一个挂载点(Mount Point)，路径(Path) 填写 `/data`，空间大小推荐不小于 25G
 
 【可选】 点击 Add 添加一个 Mount Entry，Soucre Path 填 `/dev/dri`，Target Path 填 `/dev/dri`，Create Type 选 `dir`
 
-这个参数等效于手动向配置文件里写 `lxc.mount.entry: /dev/dri dev/dri none bind,optional,create=dir`
+> 这个参数等效于手动向配置文件里写 `lxc.mount.entry: /dev/dri dev/dri none bind,optional,create=dir`
 
-接着去 选项(Options)菜单，将终端类型 (Console mode) 修改为 `shell`，不然无法在WebUI访问容器终端
+现在PCT已经会针对OCI类型的容器自动配置好，Options菜单里的内容已经不需要再手动操作
 
-将 Apparmor profile 改为 `unconfined`，功能(Features) 勾选 `AutoDev` 和 `FUSE`，
-
-配置 lxc.init.cmd 参数为 `/init androidboot.hardware=redroid androidboot.redroid_gpu_mode=auto`
-
-具体别的参数可以参考 Redroid 的文档
-
-lxc.mount.auto 将三个参数 `proc`,`sys`,`cgroup`都改为 `mixed`
+关于 `lxc.init.cmd ` 的更多参数，请去查看 [redroid-doc](https://github.com/remote-android/redroid-doc?tab=readme-ov-file#configuration)
 
 效果截图
 
@@ -87,9 +93,6 @@ lxc.mount.auto 将三个参数 `proc`,`sys`,`cgroup`都改为 `mixed`
 
 为OCI类型容器添加的 Apparmor profile ，lxc.init.cmd 和 lxc.mount.auto（后两者仅限OCI容器使用）
 ![Image](https://github.com/user-attachments/assets/0b0dfee6-564a-4363-ad3b-a68e1b5ceaf4)
-
-
-
 
 ### 为 PCT WebUI 添加 IP Info 显示界面
 
@@ -103,6 +106,7 @@ lxc.mount.auto 将三个参数 `proc`,`sys`,`cgroup`都改为 `mixed`
 wget -q https://github.com/lurenJBD/PCT-pacthes/raw/refs/heads/main/Patch-for-PVE-WebUI-Display-IPinfo-beta.sh
 bash Patch-for-PVE-WebUI-Display-IPinfo-beta.sh
 ```
+
 撤销修改
 
 ```bash
@@ -116,4 +120,3 @@ PCT主界面显示IP信息
 
 IP信息详细
 ![Image](https://github.com/user-attachments/assets/60037ce5-ca58-4a9e-88eb-91f022560a70)
-

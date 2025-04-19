@@ -1,194 +1,227 @@
 #!/bin/bash
 # Make by lurenjbd 2025-02-10
-# Edited 2025-03-29
+# Edited 2025-04-17
 # Patch to make PCT support OCI.
 
 ########### Variable ###########
 
 MIN_VERSION="8.2.0"
 RESTORE_MODE=0
-DEBUG_MODE=0
 SKIP_CONFIRM=0
+LANGUAGE="zh_cn"
+
+# 颜色代码
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' 
 
 #  Patches BASE64
 PATCH_BASE64='
-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
-QCAQCOR+5W9nhFc6AGgBAA=='
+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
+QkvCvgDIAAA='
 
 ########### Function ###########
 show_usage() {
-    echo "=========================================================="
-    echo "                 PVE OCI Support Patch Tool"
-    echo "=========================================================="
-    echo "用法 (Usage): $0 [选项 (Options)]"
+    echo -e "${BLUE}==========================================================${NC}"
+    echo -e "${BLUE}                 PVE OCI Support Patch Tool${NC}"
+    echo -e "${BLUE}==========================================================${NC}"
+    echo -e "用法 (Usage): $0 [选项 (Options)]"
     echo ""
-    echo "选项 (Options):"
-    echo "  -h, --help       显示此帮助信息 (Show this help message)"
-    echo "  -R, --restore    恢复原始文件 (Restore original files)"
-    echo "  -v, --verbose    显示调试信息 (Display debugging information)"
-    echo "  -y, --yes        跳过确认提示 (Skip confirmation prompts)"
+    echo -e "选项 (Options):"
+    echo -e "  -h, --help       显示此帮助信息 (Show this help message)"
+    echo -e "  -R, --restore    恢复原始文件 (Restore original files)"
+    echo -e "  -y, --yes        跳过确认提示 (Skip confirmation prompts)"
+    echo -e "  -c, --chinese    使用中文显示消息（默认）"
+    echo -e "  -e, --english    Use English for messages"
     echo ""
-    echo "=========================================================="
+    echo -e "${BLUE}==========================================================${NC}"
 }
 
 
 printf_msg() {
-    echo -e "${1}"
-    echo -e "${2:-$1}"
+    local text_zh="$1"
+    local text_en="$2"
+    local type="${3:-INFO}"
+    
+    local color=$BLUE
+    case "$type" in
+        SUCCESS) color=$GREEN ;;
+        WARNING) color=$YELLOW ;;
+        ERROR) color=$RED ;;
+        *) color=$BLUE ;;
+    esac
+    
+    if [[ "$LANGUAGE" == "zh_cn" ]]; then
+        echo -e "${color}${text_zh}${NC}"
+    else
+        echo -e "${color}${text_en}${NC}"
+    fi
 }
 
 parse_arguments() {
@@ -202,16 +235,20 @@ parse_arguments() {
                 RESTORE_MODE=1
                 shift
                 ;;
-            -v|--verbose)
-                DEBUG_MODE=1
-                shift
-                ;;
             -y|--yes)
                 SKIP_CONFIRM=1
                 shift
                 ;;
+            -c|--chinese)
+                LANGUAGE="zh_cn"
+                shift
+                ;;
+            -e|--english)
+                LANGUAGE="en_us"
+                shift
+                ;;
             *)
-                printf_msg "错误: 未知选项 $1" "Error: Unknown option $1"
+                printf_msg "错误: 未知选项 $1" "Error: Unknown option $1" "ERROR"
                 show_usage
                 exit 1
                 ;;
@@ -221,66 +258,100 @@ parse_arguments() {
 
 
 generate_path() {
-    PATCH_DIR=$(dirname "$1")
-    PATCH_FILE=$(basename "$1")
-    if [[ "$DEBUG_MODE" -eq 1 ]]; then
-        echo "PATCH_DIR: ${PATCH_DIR}"
-        echo "PATCH_FILE: ${PATCH_FILE}"
+    CREATE_NEW_FILE=0
+    
+    FIRST_LINE_PATH=$(awk 'NR==1 {print $2}' "$1")
+    SECOND_LINE_PATH=$(awk 'NR==2 {print $2}' "$1")
+    
+    if [[ "$FIRST_LINE_PATH" == "/dev/null" ]]; then
+        CREATE_NEW_FILE=1
     fi
-
-    if [[ "$PATCH_DIR" == *"js"* ]]; then
-        TARGET_PATH="/usr/share/pve-manager/js"
-        TARGET_FILE="${TARGET_PATH}/${PATCH_FILE%.diff}" 
-    elif [[ "$PATCH_DIR" == *"perl5"* ]]; then
-        TARGET_PATH="/usr/share/perl5"
-        FIXED_PATH=$(echo "${PATCH_FILE%.diff}" | sed 's/_/\//g')
-        if [[ "$DEBUG_MODE" -eq 1 ]]; then
-            echo "FIXED_PATH: $FIXED_PATH"
-        fi
-        TARGET_FILE="${TARGET_PATH}/${FIXED_PATH}"
-    else
-        echo "Unsupported directory: $PATCH_DIR"
+    TARGET_FILE="${SECOND_LINE_PATH}"
+    
+    if [[ ! "${SECOND_LINE_PATH}" =~ ^/ ]]; then
         TARGET_FILE=""
-        return 1
-    fi
-    if [[ "$DEBUG_MODE" -eq 1 ]]; then
-        echo "TARGET_FILE: ${TARGET_FILE}"
     fi
 }
 
 
 check_ready() {
-    generate_path $1
+    generate_path "$1"
+
+    if [[ -z "$TARGET_FILE" ]]; then
+        printf_msg "无法从补丁中获取目标文件路径: $1" "Cannot get target file path from patch: $1" "ERROR"
+        return 1
+    fi
 
     BACKUP_FILE="$TARGET_FILE.bak"
-	if [ -e "$BACKUP_FILE" ]; then
-		printf_msg "备份文件已存在: $BACKUP_FILE" "Backup file already exists: $BACKUP_FILE"
-	elif [ -e "$TARGET_FILE" ]; then
+    
+    if [ -e "$BACKUP_FILE" ]; then
+        printf_msg "备份文件已存在: $BACKUP_FILE" "Backup file already exists: $BACKUP_FILE" "WARNING"
+    elif [ -e "$TARGET_FILE" ]; then
         NEED_BACKUP_FILES+=("$TARGET_FILE")
-	else
-		printf_msg "未找到目标文件: $TARGET_FILE" "Target file not found: $TARGET_FILE"
-	fi
+    else
+        if [[ "$CREATE_NEW_FILE" -eq 0 ]]; then
+            printf_msg "未找到目标文件: $TARGET_FILE" "Target file not found: $TARGET_FILE" "ERROR"
+            return 1
+        fi
+    fi
 
     TARGET_DIR=$(dirname "$TARGET_FILE")
-    if patch --dry-run -d "$TARGET_DIR" < "$1" >/dev/null 2>&1; then
-        printf_msg "补丁 $1 可以成功应用" "$1 Patch can be apply successfully."
-        CHECK_PATCH_PASS+=("$1")
+    
+    if [[ ! -d "$TARGET_DIR" && "$CREATE_NEW_FILE" -eq 1 ]]; then
+        printf_msg "目标目录不存在，将创建: $TARGET_DIR" "Target directory does not exist, will create: $TARGET_DIR" "INFO"
+        mkdir -p "$TARGET_DIR"
+    fi
+
+    PATCH_FILE="$1"
+    if ! patch --dry-run -d "$TARGET_DIR" < "$PATCH_FILE" >/dev/null 2>&1; then
+        printf_msg "补丁 $PATCH_FILE 无法应用。请检查补丁文件和目标目录。" "$PATCH_FILE Patch cannot be apply. Please check the patch file and target directory." "ERROR"
+        patch --dry-run -d "$TARGET_DIR" < "$PATCH_FILE"
+        return 1
     else
-        printf_msg "补丁 $1 无法应用。请检查补丁文件和目标目录。" "$1 Patch cannot be apply. Please check the patch file and target directory."
+        if [[ "$CREATE_NEW_FILE" -eq 1 ]]; then
+            printf_msg "将创建新文件: $TARGET_FILE" "Will create new file: $TARGET_FILE" "SUCCESS"
+        else
+            printf_msg "补丁 $PATCH_FILE 可以成功应用" "$PATCH_FILE Patch can be apply successfully." "SUCCESS"
+        fi
+        CHECK_PATCH_PASS+=("$1")
+        return 0
     fi
 }
 
 
 restore_patch(){
-	generate_path $1
+	generate_path "$1"
+	
+	if [[ -z "$TARGET_FILE" ]]; then
+		printf_msg "无法从补丁获取目标文件路径: $1" "Cannot get target file path from patch: $1" "ERROR"
+		return 1
+	fi
 	
 	BACKUP_FILE="$TARGET_FILE.bak"
     
-    if [ -e "$BACKUP_FILE" ]; then
-        mv $BACKUP_FILE $TARGET_FILE
-        printf_msg "成功恢复文件 $TARGET_FILE" "Restore $TARGET_FILE file successfully."
+    if [[ "$CREATE_NEW_FILE" -eq 1 ]]; then
+        if [ -e "$TARGET_FILE" ]; then
+            rm -f "$TARGET_FILE"
+            printf_msg "已删除新创建的文件 $TARGET_FILE" "Deleted newly created file $TARGET_FILE" "INFO"
+        else
+            printf_msg "文件不存在，无需删除: $TARGET_FILE" "File does not exist, no need to delete: $TARGET_FILE" "INFO"
+        fi
     else
-        printf_msg "未找到备份文件 $BACKUP_FILE" "Backup file $BACKUP_FILE not found."
+        TARGET_DIR=$(dirname "$TARGET_FILE")
+        PATCH_FILE="$1"
+        
+        printf_msg "尝试反向应用补丁: $PATCH_FILE" "Trying to reverse apply patch: $PATCH_FILE" "INFO"
+        
+        if [ -e "$TARGET_FILE" ] && patch -R --dry-run -d "$TARGET_DIR" < "$PATCH_FILE" >/dev/null 2>&1; then
+            patch -R -d "$TARGET_DIR" < "$PATCH_FILE" > /dev/null 2>&1
+            printf_msg "成功反向应用补丁，恢复文件 $TARGET_FILE" "Successfully reverse applied patch to restore $TARGET_FILE" "SUCCESS"
+        elif [ -e "$BACKUP_FILE" ]; then
+            printf_msg "反向应用补丁失败，使用备份文件恢复" "Reverse patch failed, using backup file to restore" "WARNING"
+            mv $BACKUP_FILE $TARGET_FILE
+            printf_msg "成功恢复文件 $TARGET_FILE" "Restore $TARGET_FILE file successfully." "SUCCESS"
+        else
+            printf_msg "未找到备份文件 $BACKUP_FILE 且无法反向应用补丁" "Backup file $BACKUP_FILE not found and cannot reverse apply patch." "WARNING"
+        fi
     fi
 }
 
@@ -290,13 +361,7 @@ arrays_equal() {
     local arr2=("${!2}")
 
     if [ ${#arr1[@]} -ne ${#arr2[@]} ]; then
-        printf_msg "补丁检查失败！" "Patch check Failed!"
-        if [[ "$DEBUG_MODE" -eq 1 ]]; then
-            echo "PATCH_FILE_LIST长度: ${#arr1[@]}"
-            echo "CHECK_PATCH_PASS长度: ${#arr2[@]}"
-            echo "缺少的补丁: "
-            comm -23 <(printf '%s\n' "${arr1[@]}" | sort) <(printf '%s\n' "${arr2[@]}" | sort)
-        fi
+        printf_msg "补丁检查失败！" "Patch check Failed!" "ERROR"
         return 1
     fi
 
@@ -304,7 +369,7 @@ arrays_equal() {
     local sorted2=$(printf '%s\n' "${arr2[@]}" | sort)
     
     if [ "$sorted1" = "$sorted2" ]; then
-        printf_msg "补丁检查通过！可以应用到当前PVE版本" "Patch check passed! Can work with this version of PVE"
+        printf_msg "补丁检查通过！可以应用到当前PVE版本" "Patch check passed! Can work with this version of PVE" "SUCCESS"
         return 0
     fi
 }
@@ -317,18 +382,19 @@ load_module() {
     local modprobe_conf_file="/etc/modprobe.d/$module.conf"
 
     if ! lsmod | grep -q "$module"; then
-    printf_msg "$module 模块未加载，正在加载..." "$module is not loaded, loading module..."
+    printf_msg "$module 模块未加载，正在加载..." "$module is not loaded, loading module..." "INFO"
     if [[ -n "$params" ]]; then
         modprobe "$module" $params
     else
         modprobe "$module"
     fi
     else
-    printf_msg "$module 模块已加载" "$module is already loaded."
+    printf_msg "$module 模块已加载" "$module is already loaded." "INFO"
     fi
 
     if ! grep -q "$module" "$modules_file"; then
-    printf_msg "添加 $module 到 $modules_file" "Adding $module to $modules_file"
+    printf_msg "添加 $module 到 $modules_file" "Adding $module to $modules_file" "INFO"
+    sed -i -e '$a\' "$modules_file"
     echo "$module" >> "$modules_file"
     fi
     if [[ -n "$params" && ! -f "$modprobe_conf_file" ]]; then
@@ -342,32 +408,38 @@ check_running_vms() {
 
     if command -v qm &> /dev/null; then
         running_vms=$(qm list | grep running | wc -l)
-        if [[ "$DEBUG_MODE" -eq 1 ]]; then
-            echo "运行中的虚拟机数量: $running_vms"
-        fi
     fi
 
     if command -v pct &> /dev/null; then
         running_cts=$(pct list | grep running | wc -l)
-        if [[ "$DEBUG_MODE" -eq 1 ]]; then
-            echo "运行中的容器数量: $running_cts"
-        fi
     fi
 
-    echo $((running_vms + running_cts))
+    total=$((running_vms + running_cts))
+    echo "$total"
 }
 
 cleanup() {
     rm -rf /tmp/patch_files.tar.gz /tmp/pct-patch
     if [ "$Need_RestartAPI" -eq 1 ]; then
-        printf_msg "正在重启PVE Web界面服务..." "Restarting PVE Web UI services..."
+        printf_msg "正在重启PVE Web界面服务..." "Restarting PVE Web UI services..." "INFO"
         systemctl restart pveproxy.service && systemctl restart pvedaemon.service
     fi
 }
 trap cleanup EXIT
 
-
-
+read_user_input() {
+    local prompt_zh="$1"
+    local prompt_en="$2"
+    local result
+    
+    if [[ "$LANGUAGE" == "zh_cn" ]]; then
+        read -p "$prompt_zh" result
+    else
+        read -p "$prompt_en" result
+    fi
+    
+    echo "$result"
+}
 
 ########### Main ###########
 
@@ -378,28 +450,20 @@ Need_RestartAPI=0
 
 parse_arguments "$@"
 
-if [[ "$DEBUG_MODE" -eq 1 ]]; then
-    printf_msg "已启用调试模式，将显示更多调试信息" "Debug mode enabled, more debugging information will be displayed"
-fi
-
 PVE_VERSION=$(pveversion | awk -F'/' '{print $2}' | awk -F'-' '{print $1}')
 
-if [[ "$DEBUG_MODE" -eq 1 ]]; then
-    echo "PVE_VERSION: $PVE_VERSION"
-fi
-
 if [[ "$(echo -e "$MIN_VERSION\n$PVE_VERSION" | sort -V | head -n1)" != "$MIN_VERSION" ]]; then
-    printf_msg "当前PVE版本 $PVE_VERSION 低于 $MIN_VERSION。请升级PVE系统版本。" "The current PVE version $PVE_VERSION is lower than $MIN_VERSION. Please upgrade the PVE system version."
+    printf_msg "当前PVE版本 $PVE_VERSION 低于 $MIN_VERSION。请升级PVE系统版本。" "The current PVE version $PVE_VERSION is lower than $MIN_VERSION. Please upgrade the PVE system version." "WARNING"
     exit 1
 fi
 
 if [[ "$SKIP_CONFIRM" -ne 1 ]]; then
-    printf_msg "我已了解该脚本的作用，并自愿承担对应的风险。" "I have understood the purpose of this script and voluntarily assume the corresponding risks."
-    read -p "请输入 y/Y 继续执行 (Please enter y/Y to continue): " user_input
+    printf_msg "我已了解该脚本的作用，并自愿承担对应的风险。" "I have understood the purpose of this script and voluntarily assume the corresponding risks." "INFO"
+    user_input=$(read_user_input "请输入 y/Y 继续执行: " "Please enter y/Y to continue: ")
     case "$user_input" in
         y|Y) Need_RestartAPI=1;;
         *)
-            printf_msg "输入无效或用户取消操作，脚本退出。" "Invalid input or operation canceled, exiting the script."
+            printf_msg "输入无效或用户取消操作，脚本退出。" "Invalid input or operation canceled, exiting the script." "ERROR"
             exit 1
             ;;
     esac
@@ -410,106 +474,85 @@ fi
 echo "$PATCH_BASE64" | base64 -d > /tmp/patch_files.tar.gz
 tar -xzf /tmp/patch_files.tar.gz -C /tmp
 FIX_VERSION=$(echo $PVE_VERSION |  awk -F'.' '{print $1"."$2".x"}' )
-PATCH_TMP_DIR=$(find /tmp/pct-patch/${FIX_VERSION} -name "*.diff")
+PATCH_TMP_DIR=$(find -L /tmp/pct-patch/${FIX_VERSION} -name "*.diff")
 
 if [[ -z "$PATCH_TMP_DIR" ]]; then
-    printf_msg "未找到适用于PVE版本 ${FIX_VERSION} 的补丁文件。" "No patch files found for PVE version ${FIX_VERSION}."
+    printf_msg "未找到适用于PVE版本 ${FIX_VERSION} 的补丁文件。" "No patch files found for PVE version ${FIX_VERSION}." "WARNING"
     Need_RestartAPI=0
     exit 1
 fi
 
 if [[ "$RESTORE_MODE" -eq 1 ]]; then
+    if [ ! -f /usr/share/perl5/PVE/LXC/Setup/Oci.pm ]; then
+        printf_msg "未检测到补丁应用的痕迹，无需恢复。" "No patch application detected, no need to restore." "WARNING"
+        Need_RestartAPI=0
+        exit 0
+    fi
 
     for FILE in $PATCH_TMP_DIR; do
-        echo
         restore_patch "$FILE"
-        echo
     done
-
-    mv /usr/share/lxc/config/oci.common.conf.bak /usr/share/lxc/config/oci.common.conf
-    rm /usr/share/perl5/PVE/LXC/Setup/Oci.pm
     
     modules=("binder_linux" "mac80211_hwsim")
     for module in "${modules[@]}"; do
         if grep -q "$module" /etc/modules; then
-        printf_msg "从 /etc/modules 中移除 $module" "Removing $module from /etc/modules"
+        printf_msg "从 /etc/modules 中移除 $module" "Removing $module from /etc/modules" "INFO"
         sed -i "/^$module$/d" /etc/modules
         fi
     done
     rm /etc/modprobe.d/binder_linux.conf
     
-    printf_msg "恢复完成，已还原到原始状态" "Restoration completed, system has been reverted to original state"
+    printf_msg "恢复完成，已还原到原始状态" "Restoration completed, system has been reverted to original state" "SUCCESS"
     exit 0
 fi
 
 if ! command -v patch &> /dev/null; then
-    printf_msg "未找到 'patch' 命令，正在安装..." "The 'patch' command is not found. Installing it now..."
+    printf_msg "未找到 'patch' 命令，正在安装..." "The 'patch' command is not found. Installing it now..." "INFO"
     apt update
     apt install -y patch
     clear 
-    printf_msg "'patch' 命令安装成功" "The 'patch' command was installed successfully"
+    printf_msg "'patch' 命令安装成功" "The 'patch' command was installed successfully." "SUCCESS"
 fi
 
 if [ -f /usr/share/perl5/PVE/LXC/Setup/Oci.pm ]; then
-    printf_msg "该补丁已执行，请不要再次执行。如需恢复，请使用 -R 或 --restore 参数。" "The patch has already been applied. Please do not apply it again. If you need to revert, use the -R or --restore option."
+    printf_msg "该补丁已执行，请不要再次执行。如需恢复，请使用 -R 或 --restore 参数。" "The patch has already been applied. Please do not apply it again. If you need to revert, use the -R or --restore option." "WARNING"
     Need_RestartAPI=0
     exit 1
 fi
 
 for FILE in $PATCH_TMP_DIR; do
-    echo
     check_ready "$FILE"
     PATCH_FILE_LIST+=("$FILE")
-    echo
 done
 
-if [[ "$DEBUG_MODE" -eq 1 ]]; then
-    echo "PATCH_FILE_LIST: ${PATCH_FILE_LIST[@]}"
-    echo "CHECK_PATCH_PASS: ${CHECK_PATCH_PASS[@]}"
-    echo "NEED_BACKUP_FILES: ${NEED_BACKUP_FILES[@]}"
-fi
-
 if ! arrays_equal PATCH_FILE_LIST[@] CHECK_PATCH_PASS[@]; then
-    printf_msg "由于补丁检查不通过，脚本停止执行" "Script stop execution due to patch check failure"
+    printf_msg "由于补丁检查不通过，脚本停止执行" "Script stop execution due to patch check failure" "ERROR"
     Need_RestartAPI=0
     exit 1
 fi
 
 for FILE in "${NEED_BACKUP_FILES[@]}"; do
     BACKUP_FILE="$FILE.bak"
-    printf_msg "备份 $FILE 到 $BACKUP_FILE" "Backing up $FILE to $BACKUP_FILE"
+    printf_msg "备份 $FILE 到 $BACKUP_FILE" "Backing up $FILE to $BACKUP_FILE" "INFO"
     cp "$FILE" "$BACKUP_FILE"
 done
 
 for FILE in "${CHECK_PATCH_PASS[@]}"; do
-    printf_msg "应用补丁: $FILE" "Applying patch: $FILE"
+    printf_msg "应用补丁: $FILE" "Applying patch: $FILE" "INFO"
     generate_path $FILE
     TARGET_DIR=$(dirname "$TARGET_FILE")
-    patch -d "$TARGET_DIR" < "$FILE"
+    PATCH_FILE="$FILE"
+    patch -d "$TARGET_DIR" < "$PATCH_FILE" > /dev/null 2>&1
 done
-
-if [ ! -e /usr/share/lxc/config/oci.common.conf.bak ]; then
-    printf_msg "修改 /usr/share/lxc/config/oci.common.conf" "Patching /usr/share/lxc/config/oci.common.conf"
-    cp /usr/share/lxc/config/oci.common.conf /usr/share/lxc/config/oci.common.conf.bak
-    sed -i 's/^#lxc.hook.start-host/lxc.hook.start-host/' /usr/share/lxc/config/oci.common.conf
-    sed -i 's/^#lxc.hook.stop/lxc.hook.stop/' /usr/share/lxc/config/oci.common.conf
-    echo "lxc.include = /usr/share/lxc/config/common.conf.d/" >> /usr/share/lxc/config/oci.common.conf
-fi
-if [ ! -e /usr/share/perl5/PVE/LXC/Setup/Oci.pm ]; then
-    printf_msg "创建 /usr/share/perl5/PVE/LXC/Setup/Oci.pm" "Creating /usr/share/perl5/PVE/LXC/Setup/Oci.pm"
-    cp /usr/share/perl5/PVE/LXC/Setup/Unmanaged.pm /usr/share/perl5/PVE/LXC/Setup/Oci.pm
-    sed -i 's/Unmanaged/Oci/g; s/unmanaged/oci/g' /usr/share/perl5/PVE/LXC/Setup/Oci.pm
-    echo
-fi
 
 load_module "binder_linux" "devices=binder,hwbinder,vndbinder"
 load_module "mac80211_hwsim"
 
-printf_msg "所有操作已完成！" "All operations completed successfully!"
-printf_msg "作者: lurenjbd" "Author: lurenjbd"
+printf_msg "所有操作已完成！" "All operations completed successfully!" "SUCCESS"
+printf_msg "作者: lurenjbd" "Author: lurenjbd" "INFO"
 
 RUNNING_VMS=$(check_running_vms)
-if [ "$RUNNING_VMS" -gt 0 ]; then
+if [ -n "$RUNNING_VMS" ] && [ "$RUNNING_VMS" -gt 0 ]; then
     printf_msg "检测到当前有 $RUNNING_VMS 个运行中的虚拟机或容器，建议重启PVE宿主机以确保补丁完全生效。" \
-               "Detected $RUNNING_VMS running VMs or containers, it is recommended to restart the PVE host to ensure the patch takes full effect."
+               "Detected $RUNNING_VMS running VMs or containers, it is recommended to restart the PVE host to ensure the patch takes full effect." "WARNING"
 fi

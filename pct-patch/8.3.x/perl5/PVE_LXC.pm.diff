@@ -1,5 +1,5 @@
---- /usr/share/perl5/PVE/LXC.pm.bak	2025-04-02 18:24:59.731845480 +0800
-+++ /usr/share/perl5/PVE/LXC.pm	2025-04-02 18:24:59.753845519 +0800
+--- /usr/share/perl5/PVE/LXC.pm.bak	2025-04-15 21:40:05.392338169 +0800
++++ /usr/share/perl5/PVE/LXC.pm	2025-04-15 21:40:05.409344170 +0800
 @@ -586,6 +586,7 @@
      if ($features->{fuse}) {
  	# For the informational warning:

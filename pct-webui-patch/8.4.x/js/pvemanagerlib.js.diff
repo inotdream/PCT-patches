@@ -525,11 +525,3 @@
  
  	me.on('destroy', me.ipStore.stopUpdate, me.ipStore);
  
-@@ -46932,7 +47120,6 @@
- 	    me.startIPStore(me.rstore, me.rstore.getData(), false);
- 	}
- 
--	// check if the guest agent is there on every statusstore load
- 	me.mon(me.rstore, 'load', me.startIPStore, me);
-     },
- });
